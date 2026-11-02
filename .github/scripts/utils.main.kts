@@ -1,6 +1,5 @@
 import java.io.File
 import java.io.FileInputStream
-import java.io.FileOutputStream
 import java.util.Properties
 
 /**
@@ -9,6 +8,16 @@ import java.util.Properties
 fun executeCommandOnShell(command: String): Int {
     val process = ProcessBuilder("/bin/bash", "-c", command).inheritIO().start()
     return process.waitFor()
+}
+
+/**
+ * Executes the provided command on the bash shell and returns its standard output.
+ */
+fun executeCommandForOutput(command: String): String {
+    val process = ProcessBuilder("/bin/bash", "-c", command).start()
+    val output = process.inputStream.bufferedReader().readText()
+    process.waitFor()
+    return output.trim()
 }
 
 /**
@@ -26,18 +35,17 @@ fun mergeDevBranchToMaster() {
 }
 
 /**
- * Create and push the git tags for single module project
+ * Create and push the module scoped git tag, e.g. test-coverage-plugin-v1.2.3
  */
-fun tagModuleWithLatestVersion(version: String) {
-    val tag = "v$version"
-    println("version: $version \ntag: $tag")
-    val command = "git tag -a $tag -m \"release $version\""
-    executeCommandOnShell(command)
+fun tagModuleWithLatestVersion(module: String, version: String) {
+    val tag = "$module-v$version"
+    println("module: $module \nversion: $version \ntag: $tag")
+    executeCommandOnShell("git tag -a $tag -m \"release $module $version\"")
     executeCommandOnShell("git push origin --tags")
 }
 
 /**
- * Fetch the value for VERSION_NAME from gradle.properties.
+ * Fetch the value for VERSION_NAME from the module's gradle.properties.
  */
 @Throws(IllegalStateException::class)
 fun getVersionNameForModule(module: String): String {
@@ -63,11 +71,6 @@ fun readProperties(filePath: String): Properties {
     val properties = Properties()
     properties.load(FileInputStream(filePath))
     return properties
-}
-
-fun writeUpdatedVersion(filePath: String, properties: Properties, key: String, value: String) {
-    properties.setProperty(key, value)
-    properties.store(FileOutputStream(filePath), "$value version update")
 }
 
 fun backMergeMasterToDevelopment() {

@@ -4,22 +4,44 @@ on:
   workflow_dispatch:
   pull_request:
     branches: [ "development", "master" ]
-      
-env:
-  publishKey: ${{ secrets.publishKey }}
-  secretKey: ${{ secrets.secretKey }}
-  ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.signingInMemoryKey }}
-  ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.signingInMemoryKeyId }}
-  ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.signingInMemoryKeyPassword }}
-        
+
 jobs:
-  assemble-verification:
+  find-changed-modules:
     runs-on: ubuntu-latest
-    environment: publishing_gradle_config
     if: ${{ !github.event.pull_request.draft }}
+    outputs:
+      modules: ${{ steps.detect.outputs.modules }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set up Kotlin
+        uses: ./.github/actions/setup-kotlin
+      - name: Find changed modules
+        id: detect
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: kotlin ./.github/scripts/find-changed-modules.main.kts
+
+  verify-module:
+    needs: find-changed-modules
+    if: ${{ needs.find-changed-modules.outputs.modules != '[]' }}
+    runs-on: ubuntu-latest
+    environment: publishing_gradle_config
+    env:
+      ORG_GRADLE_PROJECT_signingInMemoryKey: ${{ secrets.ORG_GRADLE_PROJECT_signingInMemoryKey }}
+      ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{ secrets.ORG_GRADLE_PROJECT_signingInMemoryKeyId }}
+      ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{ secrets.ORG_GRADLE_PROJECT_signingInMemoryKeyPassword }}
+    strategy:
+      fail-fast: false
+      matrix:
+        module: ${{ fromJson(needs.find-changed-modules.outputs.modules) }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:
@@ -29,5 +51,11 @@ jobs:
         uses: gradle/actions/setup-gradle@v5
         with:
           validate-wrappers: false
-      - name: Build project
-        run: ./gradlew assemble
+      - name: Build module
+        env:
+          MODULE: ${{ matrix.module }}
+        run: ./gradlew ":${MODULE//\//:}:assemble"
+      - name: Lint check
+        env:
+          MODULE: ${{ matrix.module }}
+        run: ./gradlew ":${MODULE//\//:}:spotlessCheck" :spotlessCheck

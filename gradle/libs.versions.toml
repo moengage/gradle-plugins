@@ -1,11 +1,26 @@
 [versions]
-agp = "9.1.1"
 kotlin = "2.3.20"
+kover = "0.9.8"
+agp = "9.1.1"
+retrofit = "2.11.0"
+gradle-publish = "2.1.1"
+ktfmt = "0.62"
 
 [libraries]
 android-tools-build-gradle = { module = "com.android.tools.build:gradle", version.ref = "agp" }
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib", version.ref = "kotlin" }
+kover-gradle-plugin = { module = "org.jetbrains.kotlinx:kover-gradle-plugin", version.ref = "kover" }
+agp-api = { module = "com.android.tools.build:gradle-api", version.ref = "agp" }
+jacoco-core = { module = "org.jacoco:org.jacoco.core", version = "0.8.13" }
+intellij-coverage-agent = { module = "org.jetbrains.intellij.deps:intellij-coverage-agent", version = "1.0.765" }
+retrofit = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
+retrofit-converter-serialisation = { module = "com.squareup.retrofit2:converter-kotlinx-serialization", version.ref = "retrofit" }
+retrofit-converter-scalar = { module = "com.squareup.retrofit2:converter-scalars", version.ref = "retrofit" }
+kotlin-serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.7.1" }
+gradle-publish-plugin = { module = "com.gradle.publish:plugin-publish-plugin", version.ref = "gradle-publish" }
 
 [plugins]
-jvm = { id = "org.jetbrains.kotlin.jvm", version = "2.3.20" }
-plugin-gradle-publish = { id = "com.gradle.plugin-publish", version = "2.1.1" }
+kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+plugin-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+plugin-spotless = { id = "com.diffplug.spotless", version = "8.8.0" }

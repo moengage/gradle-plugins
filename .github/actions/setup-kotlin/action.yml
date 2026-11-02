@@ -1,0 +1,39 @@
+name: 'Set up Kotlin'
+description: 'Install the Kotlin compiler CLI (with caching) and add it to PATH'
+
+inputs:
+  version:
+    description: 'Kotlin compiler version to install'
+    required: false
+    default: '2.3.21'
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Cache Kotlin
+      uses: actions/cache@v4
+      with:
+        path: ~/.kotlin-cli
+        key: kotlin-${{ inputs.version }}
+
+    - name: Install Kotlin
+      shell: bash
+      env:
+        KOTLIN_VERSION: ${{ inputs.version }}
+      run: |
+        set -euo pipefail
+        KOTLIN_BIN="$HOME/.kotlin-cli/$KOTLIN_VERSION/kotlinc/bin"
+
+        # Download the compiler only on a cache miss.
+        if [ ! -x "$KOTLIN_BIN/kotlin" ]; then
+          echo "Downloading Kotlin $KOTLIN_VERSION..."
+          URL="https://github.com/JetBrains/kotlin/releases/download/v$KOTLIN_VERSION/kotlin-compiler-$KOTLIN_VERSION.zip"
+          curl -sSL -o /tmp/kotlin.zip "$URL"
+          mkdir -p "$HOME/.kotlin-cli/$KOTLIN_VERSION"
+          unzip -q /tmp/kotlin.zip -d "$HOME/.kotlin-cli/$KOTLIN_VERSION"
+          rm /tmp/kotlin.zip
+        else
+          echo "Using cached Kotlin $KOTLIN_VERSION."
+        fi
+
+        echo "$KOTLIN_BIN" >> "$GITHUB_PATH"
