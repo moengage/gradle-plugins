@@ -5,18 +5,26 @@
 import java.util.Locale
 
 enum class UpgradeType {
-    MAJOR, MINOR, PATCH
+    MAJOR,
+    MINOR,
+    PATCH
 }
 
-fun updateLibraryVersion(upgradeInput: String): String {
+/**
+ * Bump the VERSION_NAME in the given module's gradle.properties as per the upgrade type and
+ * return the updated version.
+ */
+fun updateLibraryVersion(module: String, upgradeInput: String): String {
     if (upgradeInput.isBlank()) {
         throw IllegalStateException("upgrade type argument required. Possible values major, minor, patch")
     }
     val upgradeType = UpgradeType.valueOf(upgradeInput.uppercase(Locale.getDefault()))
-    val properties = readProperties("./plugin/gradle.properties")
-    val versionName = properties.getProperty("VERSION_NAME") ?: throw IllegalStateException("VERSION_NAME cannot be empty")
+    val propertiesPath = "./$module/gradle.properties"
+    val versionName = readProperties(propertiesPath).getProperty("VERSION_NAME")
+        ?: throw IllegalStateException("VERSION_NAME cannot be empty")
     val updatedVersion = getUpdatedVersion(versionName, upgradeType)
-    writeUpdatedVersion("./plugin/gradle.properties", properties, "VERSION_NAME", updatedVersion)
+    // in-place text replacement to preserve the license header and other properties
+    replaceTextInFile(propertiesPath, "VERSION_NAME=$versionName", "VERSION_NAME=$updatedVersion")
     return updatedVersion
 }
 
@@ -27,34 +35,8 @@ fun getUpdatedVersion(versionName: String, upgradeType: UpgradeType): String {
     val minor = versionSplit[1].toInt()
     val patch = versionSplit[2].toInt()
     return when (upgradeType) {
-        UpgradeType.MAJOR -> {
-            "${major + 1}.0.0"
-        }
-
-        UpgradeType.MINOR -> {
-            updateMinor(major, minor, patch, versionSplit)
-        }
-
-        UpgradeType.PATCH -> {
-            val nextPatch = patch + 1
-            if (isEligibleUpdate(nextPatch, versionSplit[2])) {
-                "$major.$minor.$nextPatch"
-            } else {
-                updateMinor(major, minor, 0, versionSplit)
-            }
-        }
-    }
-}
-
-fun isEligibleUpdate(nextVersion: Int, currentVersion: String): Boolean {
-    return nextVersion.toString().length == currentVersion.length
-}
-
-fun updateMinor(major: Int, minor: Int, patch: Int, versionSplit: List<String>): String {
-    val nextMinor = minor + 1
-    return if (isEligibleUpdate(nextMinor, versionSplit[1])) {
-        "$major.$nextMinor.0"
-    } else {
-        "${major + 1}.0.0"
+        UpgradeType.MAJOR -> "${major + 1}.0.0"
+        UpgradeType.MINOR -> "$major.${minor + 1}.0"
+        UpgradeType.PATCH -> "$major.$minor.${patch + 1}"
     }
 }
