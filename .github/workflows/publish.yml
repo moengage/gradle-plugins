@@ -54,10 +54,9 @@ jobs:
           distribution: 'zulu'
           java-version: 17
       - name: Set up gradle cache
-        uses: gradle/actions/setup-gradle@v6.4.1
+        uses: gradle/actions/setup-gradle@v5
         with:
           validate-wrappers: false
-          cache-provider: basic
       - name: Set up Kotlin
         uses: ./.github/actions/setup-kotlin
       - name: Release
