@@ -57,6 +57,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v6.4.1
         with:
           validate-wrappers: false
+          cache-provider: basic
       - name: Set up Kotlin
         uses: ./.github/actions/setup-kotlin
       - name: Release
