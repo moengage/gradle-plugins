@@ -44,12 +44,12 @@ jobs:
           git config --global user.name "sdk-bot-user"
           git config --global user.email "sdk.bot@moengage.com"
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           fetch-tags: true
       - name: Set up JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           distribution: 'zulu'
           java-version: 17

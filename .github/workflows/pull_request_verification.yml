@@ -13,7 +13,7 @@ jobs:
       modules: ${{ steps.detect.outputs.modules }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Set up Kotlin
@@ -39,11 +39,11 @@ jobs:
         module: ${{ fromJson(needs.find-changed-modules.outputs.modules) }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - name: Set up JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           distribution: 'zulu'
           java-version: 17
