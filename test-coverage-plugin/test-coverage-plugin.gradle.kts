@@ -20,7 +20,7 @@ gradlePlugin {
         create("testCoveragePlugin") {
             id = "com.moengage.plugin.test.coverage"
             implementationClass = "com.moengage.plugin.test.coverage.TestCoveragePlugin"
-            tags.addAll("Coverage", "Kover", "PR Coverage")
+            tags.addAll("Coverage", "Kover", "PR-Coverage")
         }
     }
 }

@@ -23,7 +23,7 @@ gradlePlugin {
         create("publishToMavenRepositoryPlugin") {
             id = "com.moengage.plugin.maven.publish"
             implementationClass = "com.moengage.AutoPublishMavenPlugin"
-            tags.addAll("Release Plugin", "MavenCentral")
+            tags.addAll("Release-Plugin", "MavenCentral")
         }
     }
 }

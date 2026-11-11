@@ -14,13 +14,13 @@ gradlePlugin {
             id = "com.moengage.android.library.config.plugin"
             implementationClass =
                 "com.moengage.gradle.android.library.plugin.AndroidModuleConfigPlugin"
-            tags.add("Gradle Config")
+            tags.add("Gradle-Config")
         }
         register("hybridModuleConfigPlugin") {
             id = "com.moengage.android.hybrid.module.config.plugin"
             implementationClass =
                 "com.moengage.gradle.android.library.plugin.HybridModuleConfigPlugin"
-            tags.add("Gradle Config")
+            tags.add("Gradle-Config")
         }
     }
 }
