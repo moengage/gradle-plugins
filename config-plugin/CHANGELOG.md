@@ -1,6 +1,6 @@
-# Release Date
+# 27-11-2026
 
-## Release Version
+## 2.1.0
 
 - [patch] SDK-145: Changing the default consumer proguard file name to `consumer-rules.pro`
 
